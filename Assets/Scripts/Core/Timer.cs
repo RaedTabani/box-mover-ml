@@ -12,7 +12,8 @@ namespace Core{
         [Inject]
         public void Init(IConfig config){
             this.config = config;
-            Debug.Log(config.agentRotationSpeed);
+            Debug.Log($"CONFIG CONNECTED TO {gameObject.name}");
         }
+       
     }
 }

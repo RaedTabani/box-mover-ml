@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
+using Config;
 
-public class PositionController : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
+namespace Control{
+    public class PositionController : MonoBehaviour
     {
+        private IConfig config;
         
-    }
+        [Inject]
+        public void Init(IConfig config)
+        {
+            this.config = config;
+            Debug.Log($"CONFIG CONNECTED TO {gameObject.name}");
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
