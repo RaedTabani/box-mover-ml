@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using Events;
 using UnityEngine;
 
 namespace Control{
@@ -7,10 +6,9 @@ namespace Control{
     public class GoalController : MonoBehaviour
     {
         public string targetTag;
-
         private void OnTriggerEnter(Collider other) {
             if(other.CompareTag(targetTag)){
-                //Fire Gamewin event
+                EventBus.Publish(TrainingEventType.Gamewin);
             }    
         }
     }

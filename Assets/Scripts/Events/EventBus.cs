@@ -6,9 +6,9 @@ using UnityEngine.Events;
 namespace Events{
     public class EventBus 
     {
-        private static readonly Dictionary<EventType,UnityEvent> Events = new();
+        private static readonly Dictionary<TrainingEventType,UnityEvent> Events = new();
         
-        public static void Subscribe(EventType type, UnityAction listener){
+        public static void Subscribe(TrainingEventType type, UnityAction listener){
             UnityEvent thisEvent;
             if(Events.TryGetValue(type, out thisEvent)){
                 thisEvent.AddListener(listener);
@@ -20,14 +20,14 @@ namespace Events{
             }
 
         }
-        public static void Unsubscribe(EventType type, UnityAction listener){
+        public static void Unsubscribe(TrainingEventType type, UnityAction listener){
             UnityEvent thisEvent;
             if(Events.TryGetValue(type, out thisEvent )){
                 thisEvent.RemoveListener(listener);
             }
         }
 
-        public static void Publish(EventType type){
+        public static void Publish(TrainingEventType type){
             UnityEvent thisEvent;
 
             if(Events.TryGetValue(type, out thisEvent)){
@@ -36,7 +36,7 @@ namespace Events{
         }
     }
 
-    public enum EventType{
+    public enum TrainingEventType{
         Gamewin =0,
         Gamelose =1
     }

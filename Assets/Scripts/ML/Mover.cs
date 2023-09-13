@@ -1,24 +1,41 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using Control;
-using Unity.Mathematics;
+using Zenject;
+using Events;
+using Config;
 
 namespace AI{
     [RequireComponent(typeof(PositionController))]
     public class Mover : Agent
     {
+        private IRewardHandler rewardHandler;
+        private IConfig config;
         private PositionController controller;
 
+        [Inject]
+        private void Init(IConfig config, IRewardHandler rewardHandler){
+            this.config = config;
+            this.rewardHandler = rewardHandler;
+        }
+
+        private void OnEnable(){
+            EventBus.Subscribe(TrainingEventType.Gamewin,GrantReward);
+            EventBus.Subscribe(TrainingEventType.Gamelose,ApplyPunishment);
+        }
+        private void OnDisable() {
+            EventBus.Unsubscribe(TrainingEventType.Gamewin,GrantReward);
+            EventBus.Unsubscribe(TrainingEventType.Gamelose,ApplyPunishment);        
+        }
+       
         public override void Initialize(){
             controller = GetComponent<PositionController>();    
         }
         public override void OnEpisodeBegin()
         {
-            
+            controller.Reset();
         }
         public override void OnActionReceived(ActionBuffers actions){
             ActionSegment<float> continousActions = actions.ContinuousActions;
@@ -28,10 +45,12 @@ namespace AI{
             controller.Move(direction);
             controller.Rotate(rotation);
 
+            rewardHandler.HandleReward(this,config.existantial);
         }
         public override void CollectObservations(VectorSensor sensor)
         {
-           
+           sensor.AddObservation(transform.localPosition);
+           sensor.AddObservation(controller.Velocity);
         }
 
         public override void Heuristic(in ActionBuffers actionsOut)
@@ -48,6 +67,16 @@ namespace AI{
             controller.Move(direction);
             controller.Rotate(rotation);
         }
+
+        private void GrantReward(){
+            rewardHandler.HandleReward(this,config.reward);
+            EndEpisode();
+        }
+        private void ApplyPunishment(){
+            rewardHandler.HandleReward(this,config.punishment / config.maxTrainingSteps);
+            EndEpisode();
+        }
+ 
 
     }
 }
